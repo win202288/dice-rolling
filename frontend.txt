@@ -1,0 +1,39 @@
+// App.js
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [gameResult, setGameResult] = useState('');
+
+  const register = async () => {
+    await axios.post('/api/register', { username, password });
+  };
+
+  const login = async () => {
+    const response = await axios.post('/api/login', { username, password });
+    localStorage.setItem('token', response.data.token);
+  };
+
+  const playGame = async () => {
+    const response = await axios.post('/api/play', {}, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    setGameResult(response.data.result);
+  };
+
+  return (
+    <div>
+      <h1>掷骰子猜大小</h1>
+      <input placeholder="用户名" value={username} onChange={e => setUsername(e.target.value)} />
+      <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
+      <button onClick={register}>注册</button>
+      <button onClick={login}>登录</button>
+      <button onClick={playGame}>玩游戏</button>
+      <p>{gameResult}</p>
+    </div>
+  );
+}
+
+export default App;
